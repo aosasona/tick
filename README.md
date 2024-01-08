@@ -1,5 +1,5 @@
 # tick
-Local-first realtime todo list demo in Gleam, Solid.js and SQlite
+Local-first realtime todo list (kind of, todos also have extended descriptions) demo in Gleam, Solid.js and SQlite
 
 This is not designed to be fully secure, hence the presence of "anomalies" like the storage of auth tokens in the browser where it is directly accessible with Javascript. Please do not store private data with this application.
 
