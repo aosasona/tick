@@ -9,14 +9,14 @@ interface Props extends JSX.HTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
 }
 
+const variants: Record<Variant, string> = {
+  unstyled: "",
+  menu: "",
+  filled: "w-full bg-orange-500 hover:bg-orange-600 text-white text-xs py-2 px-4 rounded focus:!ring-white",
+};
+
 export default function Button(props: ParentProps<Props>) {
   const { type = "button" } = props;
-
-  const variants: Record<Variant, string> = {
-    unstyled: "",
-    menu: "",
-    filled: "w-full bg-orange-500 hover:bg-orange-600 text-white text-xs py-2 px-4 rounded focus:!ring-white",
-  };
 
   const defaultClassName = variants[props.variant || "unstyled"];
   const className = twMerge(defaultClassName, props.class);

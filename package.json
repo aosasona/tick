@@ -1,0 +1,13 @@
+{
+  "name": "tick",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:api": "watchexec -r -e toml,gleam -w ./src -- gleam run",
+    "dev:ui": "pnpm --filter @tick/ui dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
