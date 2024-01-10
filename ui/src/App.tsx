@@ -1,35 +1,16 @@
-import { createSignal } from 'solid-js'
-import solidLogo from './assets/solid.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Router, Route } from "@solidjs/router";
+import { lazy } from "solid-js";
 
-function App() {
-  const [count, setCount] = createSignal(0)
+export default function App() {
+  const Home = lazy(() => import("$/pages/home"));
+  const SignIn = lazy(() => import("$/pages/sign-in"));
+  const SignUp = lazy(() => import("$/pages/sign-up"));
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} class="logo" alt="Vite logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <img src={solidLogo} class="logo solid" alt="Solid logo" />
-        </a>
-      </div>
-      <h1>Vite + Solid</h1>
-      <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count()}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p class="read-the-docs">
-        Click on the Vite and Solid logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <Route path="/" component={Home} />
+      <Route path="/sign-in" component={SignIn} />
+      <Route path="/sign-up" component={SignUp} />
+    </Router>
+  );
 }
-
-export default App
