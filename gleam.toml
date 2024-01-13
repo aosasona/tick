@@ -16,6 +16,11 @@ mist = "~> 0.15"
 dot_env = "~> 0.2"
 gleam_json = "~> 0.7"
 sqlight = "~> 0.9"
+gleam_http = "~> 3.5"
+migrant = "~> 0.1"
+gleam_erlang = "~> 0.24"
+simplifile = "~> 0.4"
+apollo = "~> 0.1"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
