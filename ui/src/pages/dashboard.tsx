@@ -1,9 +1,10 @@
-import useAuth from "$/hooks/use-auth";
+import { getAuthState } from "$/lib/auth";
 import { useNavigate } from "@solidjs/router";
 
-export default function Home() {
+// TODO: handle note state
+export default function Dashboard() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = getAuthState();
   if (!isAuthenticated) {
     navigate("/sign-in", { replace: true });
   }

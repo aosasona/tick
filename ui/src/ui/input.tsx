@@ -10,7 +10,7 @@ interface Props extends JSX.InputHTMLAttributes<HTMLInputElement> {
 
 const variants: Record<Variant, string> = {
   unstyled: "",
-  form: "w-full bg-neutral-900 border border-neutral-800 text-neutral-100 text-xs py-2 px-3 rounded placeholder-neutral-500",
+  form: "w-full bg-transparent border border-neutral-800 text-neutral-100 text-xs py-2 px-3 rounded placeholder-neutral-500",
 };
 
 export default function Input(props: Props) {
