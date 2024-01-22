@@ -7,6 +7,7 @@ import sqlight
 pub type SuccessResponse {
   Created(json.Json)
   Data(json: Json)
+  DataWithMessage(json: Json, message: String)
   EmptySuccess
   HealthCheck
 }
@@ -25,10 +26,10 @@ type ApiSuccess {
   ApiSuccess(message: String, code: Int, data: Json)
 }
 
-pub type Response =
+pub type ApiResponse =
   Result(SuccessResponse, ErrorResponse)
 
-pub fn to_response(response: Response) -> wisp.Response {
+pub fn to_response(response: ApiResponse) -> wisp.Response {
   case response {
     Ok(res) -> handle_success_response(res)
     Error(res) -> handle_error_response(res)
@@ -39,6 +40,7 @@ fn handle_success_response(response: SuccessResponse) -> wisp.Response {
   let ApiSuccess(message, code, data) = case response {
     Created(data) -> ApiSuccess("Resource created", 201, data)
     Data(data) -> ApiSuccess("Success", 200, data)
+    DataWithMessage(data, message) -> ApiSuccess(message, 200, data)
     EmptySuccess -> ApiSuccess("Success", 200, json.null())
     HealthCheck -> ApiSuccess("I am alive", 200, json.null())
   }

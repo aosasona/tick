@@ -7,7 +7,7 @@ export default function SignUp() {
     e.stopPropagation();
 
     const data = new FormData(e.target as HTMLFormElement);
-    console.log(data);
+    console.log(data.get("email"), data.get("password"));
   }
 
   return (

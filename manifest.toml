@@ -2,37 +2,37 @@
 # You typically do not need to edit this file
 
 packages = [
-  { name = "apollo", version = "0.1.1", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "apollo", source = "hex", outer_checksum = "5790EE6356784839C52FB39E9FA9BA402C3FBAC8D68613355F23BC8C72FF053B" },
-  { name = "dot_env", version = "0.2.2", build_tools = ["gleam"], requirements = ["gleam_stdlib", "simplifile"], otp_app = "dot_env", source = "hex", outer_checksum = "5D4A427E22F5586C937A6A31AC1BFF4327113FC350DA38C159EDFF3980899700" },
+  { name = "crossbar", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_json", "gleam_stdlib"], otp_app = "crossbar", source = "hex", outer_checksum = "69A8D8BC7BC2F68F82B0240FF9E721A08E861355345331860A49FEF8818476F1" },
+  { name = "dot_env", version = "0.2.3", build_tools = ["gleam"], requirements = ["simplifile", "gleam_stdlib"], otp_app = "dot_env", source = "hex", outer_checksum = "E4FEF0AEE27AB4017BC95DFDC403FB284185C181FA076389F3CD64841EF7D849" },
   { name = "esqlite", version = "0.8.6", build_tools = ["rebar3"], requirements = [], otp_app = "esqlite", source = "hex", outer_checksum = "607E45F4DA42601D8F530979417F57A4CD629AB49085891849302057E68EA188" },
-  { name = "exception", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "exception", source = "hex", outer_checksum = "5122A559032E971E060F0EB68FDCE5961506917D64612B4F7DD958B699BE4425" },
-  { name = "gleam_crypto", version = "0.5.1", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_crypto", source = "hex", outer_checksum = "8DACF0294E82A49ACD755E68EA3C118FD9F71DEF741E049E49E79993A257B698" },
+  { name = "exception", version = "1.1.1", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "exception", source = "hex", outer_checksum = "984401CFC95BCA87C391E36194D2B9E5B946467D44893FADB1CA4ACD4B7A29CE" },
+  { name = "gleam_crypto", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_crypto", source = "hex", outer_checksum = "DE1FC4E631CA374AB29CCAEAC043EE171B86114D7DC66DD483F0A93BF0C4C6FF" },
   { name = "gleam_erlang", version = "0.24.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_erlang", source = "hex", outer_checksum = "26BDB52E61889F56A291CB34167315780EE4AA20961917314446542C90D1C1A0" },
   { name = "gleam_http", version = "3.5.3", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_http", source = "hex", outer_checksum = "C2FC3322203B16F897C1818D9810F5DEFCE347F0751F3B44421E1261277A7373" },
-  { name = "gleam_json", version = "0.7.0", build_tools = ["gleam"], requirements = ["thoas", "gleam_stdlib"], otp_app = "gleam_json", source = "hex", outer_checksum = "CB405BD93A8828BCD870463DE29375E7B2D252D9D124C109E5B618AAC00B86FC" },
-  { name = "gleam_otp", version = "0.9.0", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_stdlib"], otp_app = "gleam_otp", source = "hex", outer_checksum = "5FADBBEC5ECF3F8B6BE91101D432758503192AE2ADBAD5602158977341489F71" },
+  { name = "gleam_json", version = "0.7.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "thoas"], otp_app = "gleam_json", source = "hex", outer_checksum = "CB405BD93A8828BCD870463DE29375E7B2D252D9D124C109E5B618AAC00B86FC" },
+  { name = "gleam_otp", version = "0.9.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "gleam_erlang"], otp_app = "gleam_otp", source = "hex", outer_checksum = "5FADBBEC5ECF3F8B6BE91101D432758503192AE2ADBAD5602158977341489F71" },
   { name = "gleam_stdlib", version = "0.34.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "1FB8454D2991E9B4C0C804544D8A9AD0F6184725E20D63C3155F0AEB4230B016" },
   { name = "gleeunit", version = "1.0.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleeunit", source = "hex", outer_checksum = "D364C87AFEB26BDB4FB8A5ABDE67D635DC9FA52D6AB68416044C35B096C6882D" },
-  { name = "glisten", version = "0.9.2", build_tools = ["gleam"], requirements = ["gleam_otp", "gleam_stdlib", "gleam_erlang"], otp_app = "glisten", source = "hex", outer_checksum = "C960B6CF25D4AABAB01211146E9B57E11827B9C49E4175217E0FB7EF5BCB0FF7" },
+  { name = "glisten", version = "0.9.2", build_tools = ["gleam"], requirements = ["gleam_stdlib", "gleam_erlang", "gleam_otp"], otp_app = "glisten", source = "hex", outer_checksum = "C960B6CF25D4AABAB01211146E9B57E11827B9C49E4175217E0FB7EF5BCB0FF7" },
   { name = "marceau", version = "1.1.0", build_tools = ["gleam"], requirements = [], otp_app = "marceau", source = "hex", outer_checksum = "1AAD727A30BE0F95562C3403BB9B27C823797AD90037714255EEBF617B1CDA81" },
-  { name = "migrant", version = "0.1.21", build_tools = ["gleam"], requirements = ["gleam_stdlib", "simplifile", "sqlight"], otp_app = "migrant", source = "hex", outer_checksum = "29D7CD83A63C88343F6294DAAD05ADCBE709F36F321FA2F2775CC7EB27791146" },
-  { name = "mist", version = "0.15.0", build_tools = ["gleam"], requirements = ["glisten", "gleam_otp", "gleam_http", "gleam_erlang", "gleam_stdlib"], otp_app = "mist", source = "hex", outer_checksum = "49F51DDB64D7B2832F72727CC9721C478D6B524C96EA444C601A19D01E023C03" },
-  { name = "simplifile", version = "0.4.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "8F3C94B83F691CCFACD784A4D7C1F7E5A0437D93341549B908EE3B32E3477447" },
-  { name = "sqlight", version = "0.9.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "esqlite"], otp_app = "sqlight", source = "hex", outer_checksum = "2D9C9BA420A5E7DCE7DB2DAAE4CAB0BE6218BEB48FD1531C583550B3D1316E94" },
+  { name = "migrant", version = "0.2.0", build_tools = ["gleam"], requirements = ["simplifile", "gleam_stdlib", "sqlight"], otp_app = "migrant", source = "hex", outer_checksum = "7A7144D7D05F84C7F9DA84974F257A1FD38D32226AA6404762674EC68B9574E9" },
+  { name = "mist", version = "0.15.0", build_tools = ["gleam"], requirements = ["glisten", "gleam_otp", "gleam_stdlib", "gleam_erlang", "gleam_http"], otp_app = "mist", source = "hex", outer_checksum = "49F51DDB64D7B2832F72727CC9721C478D6B524C96EA444C601A19D01E023C03" },
+  { name = "simplifile", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "359CD7006E2F69255025C858CCC6407C11A876EC179E6ED1E46809E8DC6B1AAD" },
+  { name = "sqlight", version = "0.9.0", build_tools = ["gleam"], requirements = ["esqlite", "gleam_stdlib"], otp_app = "sqlight", source = "hex", outer_checksum = "2D9C9BA420A5E7DCE7DB2DAAE4CAB0BE6218BEB48FD1531C583550B3D1316E94" },
   { name = "thoas", version = "0.4.1", build_tools = ["rebar3"], requirements = [], otp_app = "thoas", source = "hex", outer_checksum = "4918D50026C073C4AB1388437132C77A6F6F7C8AC43C60C13758CC0ADCE2134E" },
-  { name = "wisp", version = "0.8.0", build_tools = ["gleam"], requirements = ["gleam_crypto", "mist", "gleam_http", "marceau", "gleam_stdlib", "gleam_erlang", "exception", "gleam_json", "simplifile"], otp_app = "wisp", source = "hex", outer_checksum = "3E70062D9D2EF66505ED759EEAE047AE2904450D6035F676C6925449FDB68D4A" },
+  { name = "wisp", version = "0.10.0", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_stdlib", "gleam_crypto", "mist", "exception", "gleam_http", "marceau", "gleam_json", "simplifile"], otp_app = "wisp", source = "hex", outer_checksum = "744FF91702078301BDF8FE76F26C14B658A7D151D867FA6995762318ED2536A0" },
 ]
 
 [requirements]
-apollo = { version = "~> 0.1" }
+crossbar = { version = "~> 1.1"}
 dot_env = { version = "~> 0.2" }
 gleam_erlang = { version = "~> 0.24" }
 gleam_http = { version = "~> 3.5" }
 gleam_json = { version = "~> 0.7" }
-gleam_stdlib = { version = "~> 0.32" }
+gleam_stdlib = { version = "~> 0.34" }
 gleeunit = { version = "~> 1.0" }
-migrant = { version = "~> 0.1" }
+migrant = { version = "~> 0.2" }
 mist = { version = "~> 0.15" }
-simplifile = { version = "~> 0.4" }
+simplifile = { version = "~> 1.2" }
 sqlight = { version = "~> 0.9" }
-wisp = { version = "~> 0.8" }
+wisp = { version = "~> 0.10" }
