@@ -15,32 +15,35 @@ RUN pnpm build
 
 
 ####### Build backend and merge with frontend
-FROM ghcr.io/gleam-lang/gleam:v0.33.0-erlang-alpine as build-gleam
+FROM ghcr.io/gleam-lang/gleam:v0.34.1-elixir-alpine as build-gleam
 
 COPY gleam.toml manifest.toml ./
 
 COPY ./src ./src
 
+COPY ./priv ./priv
+
 RUN mkdir -p priv/web
 
 COPY --from=build-fe /app/dist ./priv/web
 
-RUN apk add --no-cache gcc build-base ca-certificates sqlite \
-  && gleam export erlang-shipment \
-  && mv build/erlang-shipment /app
+# Add build dependencies - Elixir, Erlang and things required to build NIFs
+RUN apk add --no-cache gcc build-base libc-dev
+
+RUN mix local.hex --force
+
+RUN gleam export erlang-shipment && \
+  mv build/erlang-shipment /app
 
 
 ######### Build release image
-FROM ghcr.io/gleam-lang/gleam:v0.33.0-erlang-alpine
+FROM ghcr.io/gleam-lang/gleam:v0.34.1-erlang-alpine
 
 WORKDIR /app
 
-# # Install dependencies
-RUN apk add --no-cache sqlite
-
-# # Copy the Gleam application
+# Copy the Gleam application
 COPY --from=build-gleam /app .
 
-# # Run the application
+# Run the application
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["run"]
