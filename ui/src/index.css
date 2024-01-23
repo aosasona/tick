@@ -1,3 +1,4 @@
+@import url("https://fonts.cdnfonts.com/css/euclid-circular-b");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
@@ -11,8 +12,10 @@
 }
 
 body {
-  font-family: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  @apply bg-neutral-900 text-neutral-100 text-sm;
+  font-family: "Euclid Circular B", "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 16px;
+  font-weight: 400;
+  @apply bg-neutral-900 text-neutral-100;
 }
 
 a {

@@ -29,7 +29,11 @@
       "@core/*": [
         "./src/core/*"
       ]
-    }
+    },
+    "types": [
+      "vite-plugin-pwa/solid",
+      "vite-plugin-pwa/client"
+    ]
   },
   "include": [
     "src"
