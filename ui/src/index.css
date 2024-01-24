@@ -13,20 +13,19 @@
 
 body {
   font-family: "Euclid Circular B", "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  font-size: 16px;
   font-weight: 400;
-  @apply bg-neutral-900 text-neutral-100;
+  @apply bg-bg text-neutral-100 text-[13px];
 }
 
 a {
-  @apply text-orange-500 hover:text-orange-600 text-xs;
+  @apply text-orange-500 hover:text-orange-600 cursor-pointer;
 }
 
 a,
 button,
 input,
 textarea {
-  @apply outline-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200;
+  @apply text-[13px] outline-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200;
 }
 
 .auth-layout {

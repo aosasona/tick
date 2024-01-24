@@ -1,5 +1,6 @@
 import { Router, Route } from "@solidjs/router";
 import { lazy } from "solid-js";
+import { ReloadPrompt } from "$/ui";
 
 export default function App() {
   const Dashboard = lazy(() => import("$/pages/dashboard"));
@@ -7,12 +8,15 @@ export default function App() {
   const SignUp = lazy(() => import("$/pages/sign-up"));
 
   return (
-    <Router>
-      <Route path="/" component={Dashboard} />
-      <Route path="/sign-in" component={SignIn} />
-      <Route path="/sign-up" component={SignUp} />
-      <Route path="/n/:id" component={Dashboard} />
-      <Route path="*" component={lazy(() => import("$/pages/not-found"))} />
-    </Router>
+    <>
+      <ReloadPrompt />
+      <Router>
+        <Route path="/" component={Dashboard} />
+        <Route path="/sign-in" component={SignIn} />
+        <Route path="/sign-up" component={SignUp} />
+        <Route path="/n/:id" component={Dashboard} />
+        <Route path="*" component={lazy(() => import("$/pages/not-found"))} />
+      </Router>
+    </>
   );
 }

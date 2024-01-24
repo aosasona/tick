@@ -10,7 +10,7 @@ interface Props extends JSX.InputHTMLAttributes<HTMLInputElement> {
 
 const variants: Record<Variant, string> = {
   unstyled: "",
-  form: "w-full bg-transparent border border-neutral-800 text-neutral-100 text-xs py-2 px-3 rounded placeholder-neutral-500",
+  form: "w-full bg-transparent border border-neutral-800 text-neutral-100 py-2 px-3 rounded placeholder-neutral-500",
 };
 
 export default function Input(props: Props) {
@@ -20,7 +20,7 @@ export default function Input(props: Props) {
   return (
     <div>
       <Show when={!!props.label}>
-        <label class="block px-1 mb-1.5 text-xs text-neutral-400" for={name}>
+        <label class="block px-1 mb-1.5 text-base md:text-sm text-neutral-400" for={name}>
           {props.label}
         </label>
       </Show>

@@ -31,8 +31,7 @@
       ]
     },
     "types": [
-      "vite-plugin-pwa/solid",
-      "vite-plugin-pwa/client"
+      "vite-plugin-pwa/solid"
     ]
   },
   "include": [

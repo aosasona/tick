@@ -10,9 +10,9 @@ interface Props extends JSX.HTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<Variant, string> = {
-  unstyled: "",
-  menu: "",
-  filled: "w-full bg-orange-600 hover:bg-orange-500 text-white text-xs py-2 px-4 rounded focus:!ring-white",
+  unstyled: "cursor-pointer",
+  menu: "cursor-pointer",
+  filled: "w-full bg-primary hover:bg-orange-600 text-white py-2 px-4 rounded focus:!ring-white cursor-pointer",
 };
 
 export default function Button(props: ParentProps<Props>) {

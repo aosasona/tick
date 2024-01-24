@@ -1,8 +1,6 @@
 import { Show } from "solid-js";
 import { useRegisterSW } from "virtual:pwa-register/solid";
-import { pwaInfo } from "virtual:pwa-info";
-
-console.log(pwaInfo);
+import Button from "./button";
 
 function ReloadPrompt() {
   const sw = useRegisterSW({
@@ -22,7 +20,29 @@ function ReloadPrompt() {
     setNeedRefresh(false);
   };
 
-  return <div></div>;
+  const buttonClass = "text-primary bg-white text-xs px-2 py-0.5 rounded-sm hover:scale-95 transition-all shadow-sm";
+
+  return (
+    <Show when={needRefresh() || offlineReady()}>
+      <div class="flex gap-5 justify-center items-center py-2 px-3 bg-primary">
+        <Show when={needRefresh()} fallback={<p>App is ready to work offline!</p>}>
+          <p>A new version of this app is available</p>
+        </Show>
+
+        <Show when={needRefresh()}>
+          <Button type="button" variant="unstyled" class={buttonClass} onClick={() => sw.updateServiceWorker(true)}>
+            Reload now
+          </Button>
+        </Show>
+
+        <Show when={offlineReady()}>
+          <Button type="button" variant="unstyled" class={buttonClass} onClick={close}>
+            Close
+          </Button>
+        </Show>
+      </div>
+    </Show>
+  );
 }
 
 export default ReloadPrompt;

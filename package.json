@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev:api": "watchexec -r -e toml,gleam -w ./src -- gleam run",
-    "dev:ui": "pnpm --filter @tick/ui dev",
-    "build:ui": "pnpm --filter @tick/ui build && cp -r ./ui/dist/* ./priv/web/"
+    "dev:ui": "pnpm --filter tick dev",
+    "build:ui": "pnpm --filter tick build && cp -r ./ui/dist/* ./priv/web/"
   },
   "keywords": [],
   "author": "",

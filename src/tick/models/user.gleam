@@ -7,3 +7,10 @@ pub type User {
 pub fn create(conn: Connection, user: User) {
   todo
 }
+
+fn hash_password(password: String) -> String {
+  todo
+}
+
+@external(erlang, "Elixir.Argon2", "password_hash")
+fn argon2_hash(password: String) -> String

@@ -10,10 +10,12 @@ export default defineConfig({
       registerType: "autoUpdate",
       devOptions: { enabled: true },
       base: "/",
+      includeAssets: ["tick.svg"],
       manifest: {
         name: "Tick",
         short_name: "Tick",
         theme_color: "#F97316",
+        background_color: "#171717",
         icons: [
           {
             src: "pwa-64x64.png",
