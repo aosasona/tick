@@ -23,7 +23,7 @@ pub type ErrorResponse {
   DecodeError(List(dynamic.DecodeError))
   InvalidJson(json.DecodeError)
   NotFound
-  ServerError(String)
+  ServerError(message: String, code: Int)
   InvalidBodyType(wisp.Response)
   ValidationErrors(List(#(String, List(crossbar.CrossBarError))))
 }
@@ -117,18 +117,28 @@ fn handle_error_response(response: ErrorResponse) -> wisp.Response {
     }
     InvalidJson(e) -> {
       e
-      |> dynamic.from
-      |> dynamic.string
-      |> result.unwrap("")
+      |> fn(e) {
+        case e {
+          json.UnexpectedEndOfInput -> "Unexpected end of input"
+          json.UnexpectedByte(byte, _) -> "Unexpected byte: " <> byte
+          json.UnexpectedSequence(byte, _) -> "Unexpected sequence: " <> byte
+          json.UnexpectedFormat(_) -> "Unexpected format"
+        }
+      }
       |> fn(m) { wisp.log_error("Failed to decode JSON: " <> m) }
 
       ApiError("Invalid JSON body received", 400, [])
     }
     InvalidBodyType(_) -> ApiError("Unsupported payload type", 415, [])
     NotFound -> ApiError("Not found", 404, [])
-    ServerError(e) -> {
-      wisp.log_error(e)
-      ApiError("Internal server error, please retry in a few minutes", 500, [])
+    ServerError(message, code) -> {
+      wisp.log_error(message)
+
+      let code = case code {
+        x if x >= 500 -> x
+        _ -> 500
+      }
+      ApiError("Internal server error, please retry in a few minutes", code, [])
     }
     ValidationErrors(errors) ->
       errors

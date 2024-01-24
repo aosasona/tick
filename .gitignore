@@ -1,2 +1,2 @@
 *.db
-priv/web/*
+priv/web

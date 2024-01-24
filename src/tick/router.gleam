@@ -28,6 +28,7 @@ fn handle_api_routes(
     Get, ["health"] -> Ok(api.HealthCheck)
     Post, ["auth", "sign-in"] -> auth.sign_in(req, ctx)
     Post, ["auth", "sign-up"] -> auth.sign_up(req, ctx)
+    // technically, I should be handling  "Method not found" cases but IDC at this time
     _, _ -> Error(api.NotFound)
   }
 }
