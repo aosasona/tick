@@ -6,6 +6,6 @@ CREATE TABLE auth_tokens (
     user_id INTEGER NOT NULL,
     token VARCHAR(255) NOT NULL UNIQUE,
     ttl_in_seconds INTEGER NOT NULL,
-    issued_at TIMESTAMP NOT NULL,
+    issued_at INTEGER NOT NULL DEFAULT (unixepoch()),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );

@@ -31,8 +31,7 @@ pub fn find_by_email(
   conn: Connection,
   email: String,
 ) -> Result(Option(User), ErrorResponse) {
-  let query =
-    "select id, email, password, unixepoch(created_at) from users where email = $1 limit 1"
+  let query = "select * from users where email = $1 limit 1"
   query_one(conn, query, [sqlight.text(email)], db_decoder())
 }
 
@@ -40,8 +39,7 @@ pub fn create(
   conn: Connection,
   user: User,
 ) -> Result(Option(User), ErrorResponse) {
-  let query =
-    "insert into users (email, password) values ($1, $2) returning id, email, password, unixepoch(created_at)"
+  let query = "insert into users (email, password) values ($1, $2) returning *"
   let password = hash_password(user.password)
   query_one(
     conn: conn,

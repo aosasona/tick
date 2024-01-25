@@ -7,7 +7,7 @@
 CREATE TABLE session_tokens (
     id INTEGER PRIMARY KEY,
     token VARCHAR(255) NOT NULL UNIQUE,
-    parent_auth_token INTEGER NOT NULL, --parent auth token
-    issued_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    parent_auth_token INTEGER NOT NULL,
+    issued_at INTEGER NOT NULL DEFAULT (unixepoch()),
     FOREIGN KEY (parent_auth_token) REFERENCES auth_tokens (id)
 );
