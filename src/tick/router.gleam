@@ -1,4 +1,3 @@
-import gleam/http.{Get, Post}
 import gleam/http/request
 import gleam/io
 import gleam/string_builder
@@ -24,12 +23,12 @@ fn handle_api_routes(
   ctx: web.Context,
   path_parts: List(String),
 ) -> ApiResponse {
-  case req.method, path_parts {
-    Get, ["health"] -> Ok(api.HealthCheck)
-    Post, ["auth", "sign-in"] -> auth.sign_in(req, ctx)
-    Post, ["auth", "sign-up"] -> auth.sign_up(req, ctx)
-    // technically, I should be handling  "Method not found" cases but IDC at this time
-    _, _ -> Error(api.NotFound)
+  case path_parts {
+    ["health"] -> Ok(api.HealthCheck)
+    ["auth", "sign-in"] -> auth.sign_in(req, ctx)
+    ["auth", "sign-up"] -> auth.sign_up(req, ctx)
+    ["me"] -> auth.me(req, ctx)
+    _ -> Error(api.NotFound)
   }
 }
 

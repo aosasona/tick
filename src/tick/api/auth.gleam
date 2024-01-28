@@ -1,16 +1,20 @@
 import crossbar.{string_value}
 import gleam/bool
 import gleam/dynamic
+import gleam/http.{Get, Post}
 import gleam/list
-import gleam/option.{type Option, None, Some}
-import gleam/result
+import gleam/option.{type Option, None}
+import gleam/result.{try}
 import tick/models/user.{type User, User}
+import tick/models/auth_token
 import tick/api.{
-  type ApiResponse, type ErrorResponse, ClientError, Data, ServerError,
-  ValidationErrors,
+  type ApiResponse, type ErrorResponse, ClientError, Data, DataWithResponse,
+  ServerError, ValidationErrors,
 }
 import tick/web.{type Context}
 import wisp.{type Request}
+
+const auth_token_key = "auth_token"
 
 // Using optional fields so that decoding doesn't fail if the field is missing and it can be caught by validation
 type CreateUserPayload {
@@ -26,10 +30,11 @@ type SignInPayload {
 }
 
 pub fn sign_in(req: Request, ctx: Context) -> ApiResponse {
+  use <- api.require_method(req, Post)
   use body <- api.json_body(req, sign_in_payload_decoder())
-  use body <- result.try(validate_sign_in_payload(body))
+  use body <- try(validate_sign_in_payload(body))
   use opt_user <- result.try(user.find_by_email(ctx.database, body.email))
-  use user <- result.try(
+  use user <- try(
     opt_user
     |> option.to_result(ClientError("Invalid email or password", 401)),
   )
@@ -37,12 +42,15 @@ pub fn sign_in(req: Request, ctx: Context) -> ApiResponse {
     when: !user.verify_password(body.password, user.password),
     return: Error(ClientError("Invalid email or password", 401)),
   )
+  use token <- try(auth_token.new(ctx.database, user.id))
 
-  // TODO: create session_tokens table, generate tokens and store them in the DB
-  Ok(Data(user.to_json(user)))
+  web.set_cookie(req, auth_token_key, token.value, token.ttl_in_seconds)
+  |> DataWithResponse(user.to_json(user), _)
+  |> Ok()
 }
 
 pub fn sign_up(req: Request, ctx: Context) -> ApiResponse {
+  use <- api.require_method(req, Post)
   use body <- api.json_body(req, create_user_payload_decoder())
   use body <- result.try(validate_create_user_payload(body))
   use opt_user <- result.try(user.find_by_email(ctx.database, body.email))
@@ -57,6 +65,11 @@ pub fn sign_up(req: Request, ctx: Context) -> ApiResponse {
   )
 
   Ok(Data(user.to_json(u)))
+}
+
+pub fn me(req: Request, ctx: Context) -> ApiResponse {
+  use <- api.require_method(req, Get)
+  Ok(api.EmptySuccess)
 }
 
 fn create_user_payload_decoder() -> dynamic.Decoder(CreateUserPayload) {

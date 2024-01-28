@@ -1,8 +1,10 @@
 import crossbar
 import gleam/bool
 import gleam/dynamic
+import gleam/list
 import gleam/string_builder
 import gleam/io
+import gleam/http.{type Method}
 import gleam/http/response.{Response as HttpResponse}
 import gleam/json.{type Json}
 import gleam/result
@@ -13,6 +15,8 @@ pub type SuccessResponse {
   Created(json.Json)
   Data(json: Json)
   DataWithMessage(json: Json, message: String)
+  /// This is a special case for when we have a response already created and we want to append data onto it
+  DataWithResponse(json: Json, response: wisp.Response)
   EmptySuccess
   HealthCheck
 }
@@ -33,7 +37,12 @@ type ApiError {
 }
 
 type ApiSuccess {
-  ApiSuccess(message: String, code: Int, data: Json)
+  ApiSuccess(
+    message: String,
+    code: Int,
+    data: Json,
+    headers: List(#(String, String)),
+  )
 }
 
 pub type ApiResponse =
@@ -44,6 +53,15 @@ pub fn to_response(response: ApiResponse) -> wisp.Response {
     Ok(res) -> handle_success_response(res)
     Error(res) -> handle_error_response(res)
   }
+}
+
+pub fn require_method(
+  request: wisp.Request,
+  method: Method,
+  next: fn() -> ApiResponse,
+) -> ApiResponse {
+  use <- bool.guard(request.method == method, next())
+  Error(ClientError("Method not allowed", 405))
 }
 
 pub fn json_body(
@@ -79,18 +97,33 @@ pub fn json_body(
 }
 
 fn handle_success_response(response: SuccessResponse) -> wisp.Response {
-  let ApiSuccess(message, code, data) = case response {
-    Created(data) -> ApiSuccess("Resource created", 201, data)
-    Data(data) -> ApiSuccess("Success", 200, data)
-    DataWithMessage(data, message) -> ApiSuccess(message, 200, data)
-    EmptySuccess -> ApiSuccess("Success", 200, json.null())
-    HealthCheck -> ApiSuccess("I am alive", 200, json.null())
+  let ApiSuccess(message, code, data, headers) = case response {
+    Created(data) ->
+      ApiSuccess("Resource created", code: 201, data: data, headers: [])
+
+    Data(data) ->
+      ApiSuccess("Request successful", code: 200, data: data, headers: [])
+
+    DataWithMessage(data, message) ->
+      ApiSuccess(message, code: 200, data: data, headers: [])
+
+    DataWithResponse(data, addtional_response) -> {
+      let HttpResponse(_, headers, _) = addtional_response
+      ApiSuccess("Request successful", code: 200, data: data, headers: headers)
+    }
+
+    EmptySuccess ->
+      ApiSuccess("Success", code: 200, data: json.null(), headers: [])
+
+    HealthCheck ->
+      ApiSuccess("I am alive", code: 200, data: json.null(), headers: [])
   }
 
   message
   |> make_success_json(data)
   |> string_builder.from_string
   |> wisp.json_response(code)
+  |> append_headers(headers)
 }
 
 fn make_success_json(message: String, data: Json) -> String {
@@ -164,4 +197,20 @@ fn make_error_json(message: String, errors: List(#(String, Json))) -> String {
 
 fn errors_json(err: #(String, Json)) {
   json.object([#(err.0, err.1)])
+}
+
+fn append_headers(
+  response: wisp.Response,
+  headers: List(#(String, String)),
+) -> wisp.Response {
+  case headers {
+    [] -> response
+    _ -> {
+      HttpResponse(
+        status: response.status,
+        body: response.body,
+        headers: list.concat([response.headers, headers]),
+      )
+    }
+  }
 }
