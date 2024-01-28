@@ -9,7 +9,7 @@ import tick/models/user.{type User, User}
 import tick/models/auth_token
 import tick/api.{
   type ApiResponse, type ErrorResponse, ClientError, Data, DataWithResponse,
-  ServerError, ValidationErrors,
+  NotAuthenticated, ServerError, ValidationErrors,
 }
 import tick/web.{type Context}
 import wisp.{type Request}
@@ -69,7 +69,14 @@ pub fn sign_up(req: Request, ctx: Context) -> ApiResponse {
 
 pub fn me(req: Request, ctx: Context) -> ApiResponse {
   use <- api.require_method(req, Get)
-  Ok(api.EmptySuccess)
+  use token <- try(
+    web.get_cookie(req, auth_token_key)
+    |> option.to_result(NotAuthenticated),
+  )
+  use opt_user <- try(auth_token.find_user(ctx.database, token))
+  use user <- try(option.to_result(opt_user, NotAuthenticated))
+
+  Ok(Data(user.to_json(user)))
 }
 
 fn create_user_payload_decoder() -> dynamic.Decoder(CreateUserPayload) {

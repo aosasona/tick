@@ -31,7 +31,7 @@ pub fn find_by_email(
   conn: Connection,
   email: String,
 ) -> Result(Option(User), ErrorResponse) {
-  let query = "select * from users where email = $1 limit 1"
+  let query = "select * from users where email = ?"
   query_one(conn, query, [sqlight.text(email)], db_decoder())
 }
 
@@ -39,7 +39,7 @@ pub fn create(
   conn: Connection,
   user: User,
 ) -> Result(Option(User), ErrorResponse) {
-  let query = "insert into users (email, password) values ($1, $2) returning *"
+  let query = "insert into users (email, password) values (?, ?) returning *"
   let password = hash_password(user.password)
   query_one(
     conn: conn,
@@ -57,7 +57,7 @@ pub fn to_json(user: User) -> Json {
   ])
 }
 
-fn db_decoder() -> Decoder(User) {
+pub fn db_decoder() -> Decoder(User) {
   dynamic.decode4(
     User,
     dynamic.element(0, dynamic.optional(dynamic.int)),

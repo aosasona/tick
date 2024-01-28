@@ -26,6 +26,8 @@ pub type ErrorResponse {
   DatabaseError(sqlight.Error)
   DecodeError(List(dynamic.DecodeError))
   InvalidJson(json.DecodeError)
+  NotAuthenticated
+  NotAuthorized
   NotFound
   ServerError(message: String, code: Int)
   InvalidBodyType(wisp.Response)
@@ -139,15 +141,18 @@ fn make_success_json(message: String, data: Json) -> String {
 fn handle_error_response(response: ErrorResponse) -> wisp.Response {
   let ApiError(message, code, errors) = case response {
     ClientError(message, code) -> ApiError(message, code, [])
+
     DatabaseError(e) -> {
       wisp.log_error(e.message)
       ApiError("Something went wrong. Please try again later.", 500, [])
     }
+
     DecodeError(errors) -> {
       io.debug(errors)
 
       ApiError("Bad request", 400, [])
     }
+
     InvalidJson(e) -> {
       e
       |> fn(e) {
@@ -162,8 +167,17 @@ fn handle_error_response(response: ErrorResponse) -> wisp.Response {
 
       ApiError("Invalid JSON body received", 400, [])
     }
+
     InvalidBodyType(_) -> ApiError("Unsupported payload type", 415, [])
+
+    NotAuthenticated ->
+      ApiError("You must be logged in to perform this action!", 401, [])
+
+    NotAuthorized ->
+      ApiError("You are not authorized to perform this action!", 403, [])
+
     NotFound -> ApiError("Not found", 404, [])
+
     ServerError(message, code) -> {
       wisp.log_error(message)
 
@@ -173,6 +187,7 @@ fn handle_error_response(response: ErrorResponse) -> wisp.Response {
       }
       ApiError("Internal server error, please retry in a few minutes", code, [])
     }
+
     ValidationErrors(errors) ->
       errors
       |> crossbar.to_serializable_list(crossbar.Array)

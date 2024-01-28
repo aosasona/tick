@@ -3,9 +3,10 @@ import gleam/json
 import gleam/option.{type Option}
 import gleam/result.{try}
 import ids/nanoid
-import sqlight.{int, text}
+import sqlight.{type Connection, int, text}
 import tick/api.{type ErrorResponse}
 import tick/database.{query_one}
+import tick/models/user.{type User}
 
 const default_ttl: Int = 2_592_000
 
@@ -19,7 +20,10 @@ pub type AuthToken {
   )
 }
 
-pub fn new(conn, user_id: Option(Int)) -> Result(AuthToken, ErrorResponse) {
+pub fn new(
+  conn: Connection,
+  user_id: Option(Int),
+) -> Result(AuthToken, ErrorResponse) {
   use uid <- try(option.to_result(
     user_id,
     api.ServerError("Missing user_id", 500),
@@ -38,6 +42,15 @@ pub fn new(conn, user_id: Option(Int)) -> Result(AuthToken, ErrorResponse) {
 
   created_token
   |> option.to_result(api.ServerError("Failed to create token", 500))
+}
+
+pub fn find_user(
+  conn: Connection,
+  token auth_token: String,
+) -> Result(Option(User), ErrorResponse) {
+  let query =
+    "select u.* from auth_tokens a left join users u on u.id = a.user_id where a.token = ?"
+  query_one(conn, query, [sqlight.text(auth_token)], user.db_decoder())
 }
 
 pub fn to_json(token: AuthToken) -> json.Json {
