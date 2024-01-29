@@ -1,3 +1,4 @@
+import birl.{to_unix, utc_now}
 import crossbar
 import gleam/bool
 import gleam/dynamic
@@ -19,6 +20,7 @@ pub type SuccessResponse {
   DataWithResponse(json: Json, response: wisp.Response)
   EmptySuccess
   HealthCheck
+  Pong
 }
 
 pub type ErrorResponse {
@@ -119,6 +121,14 @@ fn handle_success_response(response: SuccessResponse) -> wisp.Response {
 
     HealthCheck ->
       ApiSuccess("I am alive", code: 200, data: json.null(), headers: [])
+
+    Pong ->
+      ApiSuccess(
+        "Pong",
+        code: 200,
+        data: json.object([#("current_time", json.int(to_unix(utc_now())))]),
+        headers: [],
+      )
   }
 
   message

@@ -29,6 +29,7 @@ fn handle_api_routes(
     ["auth", "sign-up"] -> auth.sign_up(req, ctx)
     ["auth", "sign-out"] -> auth.sign_out(req, ctx)
     ["me"] -> auth.me(req, ctx)
+    ["ping"] -> Ok(api.Pong)
     _ -> Error(api.NotFound)
   }
 }
