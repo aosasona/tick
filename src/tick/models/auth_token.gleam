@@ -44,6 +44,19 @@ pub fn new(
   |> option.to_result(api.ServerError("Failed to create token", 500))
 }
 
+pub fn delete(
+  conn: Connection,
+  token: String,
+) -> Result(Option(Int), ErrorResponse) {
+  let query = "delete from auth_tokens where token = ? returning id"
+  query_one(
+    conn,
+    query,
+    [sqlight.text(token)],
+    dynamic.element(at: 0, of: dynamic.int),
+  )
+}
+
 pub fn find_user(
   conn: Connection,
   token auth_token: String,

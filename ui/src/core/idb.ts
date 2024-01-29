@@ -1,0 +1,3 @@
+class IDB { }
+
+function init() { }

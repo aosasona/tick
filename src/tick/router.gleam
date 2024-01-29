@@ -27,6 +27,7 @@ fn handle_api_routes(
     ["health"] -> Ok(api.HealthCheck)
     ["auth", "sign-in"] -> auth.sign_in(req, ctx)
     ["auth", "sign-up"] -> auth.sign_up(req, ctx)
+    ["auth", "sign-out"] -> auth.sign_out(req, ctx)
     ["me"] -> auth.me(req, ctx)
     _ -> Error(api.NotFound)
   }

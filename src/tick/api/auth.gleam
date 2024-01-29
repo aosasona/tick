@@ -2,6 +2,7 @@ import crossbar.{string_value}
 import gleam/bool
 import gleam/dynamic
 import gleam/http.{Get, Post}
+import gleam/json
 import gleam/list
 import gleam/option.{type Option, None}
 import gleam/result.{try}
@@ -65,6 +66,19 @@ pub fn sign_up(req: Request, ctx: Context) -> ApiResponse {
   )
 
   Ok(Data(user.to_json(u)))
+}
+
+pub fn sign_out(req: Request, ctx: Context) -> ApiResponse {
+  use <- api.require_method(req, Post)
+  use token <- try(
+    web.get_cookie(req, auth_token_key)
+    |> option.to_result(NotAuthenticated),
+  )
+  use _ <- try(auth_token.delete(ctx.database, token))
+
+  web.remove_cookie(req, auth_token_key)
+  |> DataWithResponse(json.null(), _)
+  |> Ok()
 }
 
 pub fn me(req: Request, ctx: Context) -> ApiResponse {
