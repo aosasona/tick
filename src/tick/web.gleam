@@ -1,9 +1,11 @@
 import gleam/option.{type Option}
-import sqlight
+import sqlight.{type Connection}
 import wisp
 
+pub const auth_token_key = "auth_token"
+
 pub type Context {
-  Context(database: sqlight.Connection, web_directory: String)
+  Context(database: Connection, web_directory: String)
 }
 
 pub fn set_cookie(

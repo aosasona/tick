@@ -12,10 +12,8 @@ import tick/api.{
   type ApiResponse, type ErrorResponse, ClientError, Data, DataWithResponse,
   NotAuthenticated, ServerError, ValidationErrors,
 }
-import tick/web.{type Context}
+import tick/web.{type Context, auth_token_key}
 import wisp.{type Request}
-
-const auth_token_key = "auth_token"
 
 // Using optional fields so that decoding doesn't fail if the field is missing and it can be caught by validation
 type CreateUserPayload {
@@ -83,10 +81,7 @@ pub fn sign_out(req: Request, ctx: Context) -> ApiResponse {
 
 pub fn me(req: Request, ctx: Context) -> ApiResponse {
   use <- api.require_method(req, Get)
-  use token <- try(
-    web.get_cookie(req, auth_token_key)
-    |> option.to_result(NotAuthenticated),
-  )
+  use token <- api.require_auth(req, ctx.database)
   use opt_user <- try(auth_token.find_user(ctx.database, token))
   use user <- try(option.to_result(opt_user, NotAuthenticated))
 

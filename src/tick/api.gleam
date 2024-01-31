@@ -2,13 +2,13 @@ import birl.{to_unix, utc_now}
 import crossbar
 import gleam/bool
 import gleam/dynamic
-import gleam/list
-import gleam/string_builder
-import gleam/io
 import gleam/http.{type Method}
 import gleam/http/response.{Response as HttpResponse}
+import gleam/io
 import gleam/json.{type Json}
+import gleam/list
 import gleam/result
+import gleam/string_builder
 import sqlight
 import wisp
 
@@ -66,6 +66,51 @@ pub fn require_method(
 ) -> ApiResponse {
   use <- bool.guard(request.method == method, next())
   Error(ClientError("Method not allowed", 405))
+}
+
+pub fn require_auth(
+  req: wisp.Request,
+  connection: sqlight.Connection,
+  next: fn(String) -> ApiResponse,
+) -> ApiResponse {
+  use token <- result.try(
+    req
+    |> wisp.get_cookie("auth_token", wisp.Signed)
+    |> result.map_error(fn(_) { NotAuthenticated }),
+  )
+
+  case verify_token(connection, token) {
+    Ok(_) -> next(token)
+    Error(e) -> Error(e)
+  }
+}
+
+fn verify_token(
+  connection: sqlight.Connection,
+  token: String,
+) -> Result(Nil, ErrorResponse) {
+  let query =
+    "select ttl_in_seconds, issued_at from auth_tokens where token = ?"
+  let result =
+    sqlight.query(
+      query,
+      on: connection,
+      with: [sqlight.text(token)],
+      expecting: dynamic.tuple2(dynamic.int, dynamic.int),
+    )
+    |> result.map_error(DatabaseError)
+
+  case result {
+    Ok([]) -> Error(NotAuthenticated)
+    Ok([d, ..]) | Ok([d]) -> {
+      let expires_at = d.0 + d.1
+      let now = to_unix(utc_now())
+      use <- bool.guard(expires_at > now, Ok(Nil))
+
+      Error(ClientError("Session expired", 401))
+    }
+    Error(e) -> Error(e)
+  }
 }
 
 pub fn json_body(

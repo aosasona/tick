@@ -57,6 +57,14 @@ pub fn delete(
   )
 }
 
+pub fn find_one(
+  conn conn: Connection,
+  token token: String,
+) -> Result(Option(AuthToken), ErrorResponse) {
+  let query = "select * from auth_tokens where token = ?"
+  query_one(conn, query, [sqlight.text(token)], db_decoder())
+}
+
 pub fn find_user(
   conn: Connection,
   token auth_token: String,
