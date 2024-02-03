@@ -27,7 +27,7 @@ RUN mkdir -p priv/web
 
 COPY --from=build-fe /app/dist ./priv/web
 
-# Add build dependencies - Elixir, Erlang and things required to build NIFs
+# Add build dependencies
 RUN apk add --no-cache gcc build-base libc-dev
 
 RUN mix local.hex --force

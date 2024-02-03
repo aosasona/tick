@@ -22,13 +22,12 @@ pub fn main() {
 
   let ctx = web.Context(database: db, web_directory: web_directory)
 
-  // TODO: start with OTP
-  let assert Ok(_) =
-    router.handle_request(_, ctx)
-    |> wisp.mist_handler(get_secret_key())
-    |> mist.new
-    |> mist.port(port)
-    |> mist.start_http
+  // TODO: start with OTP let assert Ok(_) =
+  router.handle_request(_, ctx)
+  |> wisp.mist_handler(get_secret_key())
+  |> mist.new
+  |> mist.port(port)
+  |> mist.start_http
 
   process.sleep_forever()
 }
@@ -40,5 +39,5 @@ fn get_secret_key() -> String {
 
 fn get_port() -> Int {
   env.get_int("PORT")
-  |> result.unwrap(9000)
+  |> result.unwrap(8080)
 }

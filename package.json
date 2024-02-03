@@ -6,7 +6,9 @@
   "scripts": {
     "dev:api": "watchexec -r -e toml,gleam -w ./src -- gleam run",
     "dev:ui": "pnpm --filter tick dev",
-    "build:ui": "pnpm --filter tick build && cp -r ./ui/dist/* ./priv/web/"
+    "build:ui": "mkdir -p ./priv/web && pnpm --filter tick build && cp -r ./ui/dist/* ./priv/web/",
+    "build:api": "gleam export erlang-shipment",
+    "start:prod": "pnpm build:ui && pnpm build:api && cd build/erlang-shipment && ./entrypoint.sh run"
   },
   "keywords": [],
   "author": "",
