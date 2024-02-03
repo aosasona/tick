@@ -16,10 +16,12 @@ pub type SuccessResponse {
   Created(json.Json)
   Data(json: Json)
   DataWithMessage(json: Json, message: String)
-  /// This is a special case for when we have a response already created and we want to append data onto it
-  DataWithResponse(json: Json, response: wisp.Response)
   EmptySuccess
   HealthCheck
+  SuccessWithResponse(
+    response: SuccessResponse,
+    additional_response: wisp.Response,
+  )
   Pong
 }
 
@@ -27,6 +29,7 @@ pub type ErrorResponse {
   ClientError(message: String, code: Int)
   DatabaseError(sqlight.Error)
   DecodeError(List(dynamic.DecodeError))
+  ErrorWithResponse(response: ErrorResponse, additional_response: wisp.Response)
   InvalidJson(json.DecodeError)
   NotAuthenticated
   NotAuthorized
@@ -37,7 +40,12 @@ pub type ErrorResponse {
 }
 
 type ApiError {
-  ApiError(message: String, code: Int, errors: List(#(String, Json)))
+  ApiError(
+    message: String,
+    code: Int,
+    errors: List(#(String, Json)),
+    headers: List(#(String, String)),
+  )
 }
 
 type ApiSuccess {
@@ -145,8 +153,8 @@ pub fn json_body(
   }
 }
 
-fn handle_success_response(response: SuccessResponse) -> wisp.Response {
-  let ApiSuccess(message, code, data, headers) = case response {
+fn to_api_success(response: SuccessResponse) -> ApiSuccess {
+  case response {
     Created(data) ->
       ApiSuccess("Resource created", code: 201, data: data, headers: [])
 
@@ -156,10 +164,8 @@ fn handle_success_response(response: SuccessResponse) -> wisp.Response {
     DataWithMessage(data, message) ->
       ApiSuccess(message, code: 200, data: data, headers: [])
 
-    DataWithResponse(data, addtional_response) -> {
-      let HttpResponse(_, headers, _) = addtional_response
-      ApiSuccess("Request successful", code: 200, data: data, headers: headers)
-    }
+    SuccessWithResponse(s, addtional_response) ->
+      ApiSuccess(..to_api_success(s), headers: addtional_response.headers)
 
     EmptySuccess ->
       ApiSuccess("Success", code: 200, data: json.null(), headers: [])
@@ -175,6 +181,10 @@ fn handle_success_response(response: SuccessResponse) -> wisp.Response {
         headers: [],
       )
   }
+}
+
+fn handle_success_response(response: SuccessResponse) -> wisp.Response {
+  let ApiSuccess(message, code, data, headers) = to_api_success(response)
 
   message
   |> make_success_json(data)
@@ -193,20 +203,22 @@ fn make_success_json(message: String, data: Json) -> String {
   |> json.to_string
 }
 
-fn handle_error_response(response: ErrorResponse) -> wisp.Response {
-  let ApiError(message, code, errors) = case response {
-    ClientError(message, code) -> ApiError(message, code, [])
+fn to_api_error(response: ErrorResponse) -> ApiError {
+  case response {
+    ClientError(message, code) -> ApiError(message, code, [], [])
 
     DatabaseError(e) -> {
       wisp.log_error(e.message)
-      ApiError("Something went wrong. Please try again later.", 500, [])
+      ApiError("Something went wrong. Please try again later.", 500, [], [])
     }
 
     DecodeError(errors) -> {
       io.debug(errors)
-
-      ApiError("Bad request", 400, [])
+      ApiError("Bad request", 400, [], [])
     }
+
+    ErrorWithResponse(e, additonal_response) ->
+      ApiError(..to_api_error(e), headers: additonal_response.headers)
 
     InvalidJson(e) -> {
       e
@@ -220,18 +232,18 @@ fn handle_error_response(response: ErrorResponse) -> wisp.Response {
       }
       |> fn(m) { wisp.log_error("Failed to decode JSON: " <> m) }
 
-      ApiError("Invalid JSON body received", 400, [])
+      ApiError("Invalid JSON body received", 400, [], [])
     }
 
-    InvalidBodyType(_) -> ApiError("Unsupported payload type", 415, [])
+    InvalidBodyType(_) -> ApiError("Unsupported payload type", 415, [], [])
 
     NotAuthenticated ->
-      ApiError("You must be logged in to perform this action!", 401, [])
+      ApiError("You must be logged in to perform this action!", 401, [], [])
 
     NotAuthorized ->
-      ApiError("You are not authorized to perform this action!", 403, [])
+      ApiError("You are not authorized to perform this action!", 403, [], [])
 
-    NotFound -> ApiError("Not found", 404, [])
+    NotFound -> ApiError("Not found", 404, [], [])
 
     ServerError(message, code) -> {
       wisp.log_error(message)
@@ -240,19 +252,29 @@ fn handle_error_response(response: ErrorResponse) -> wisp.Response {
         x if x >= 500 -> x
         _ -> 500
       }
-      ApiError("Internal server error, please retry in a few minutes", code, [])
+      ApiError(
+        "Internal server error, please retry in a few minutes",
+        code,
+        [],
+        [],
+      )
     }
 
     ValidationErrors(errors) ->
       errors
       |> crossbar.to_serializable_list(crossbar.Array)
-      |> ApiError("Bad request", 400, _)
+      |> ApiError("Bad request", 400, _, [])
   }
+}
+
+fn handle_error_response(response: ErrorResponse) -> wisp.Response {
+  let ApiError(message, code, errors, headers) = to_api_error(response)
 
   message
   |> make_error_json(errors)
   |> string_builder.from_string
   |> wisp.json_response(code)
+  |> append_headers(headers)
 }
 
 fn make_error_json(message: String, errors: List(#(String, Json))) -> String {

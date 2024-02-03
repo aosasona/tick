@@ -2,15 +2,20 @@ import crossbar.{string_value}
 import gleam/bool
 import gleam/dynamic
 import gleam/http.{Get, Post}
+import gleam/io
 import gleam/json
 import gleam/list
 import gleam/option.{type Option, None}
 import gleam/result.{try}
 import tick/models/user.{type User, User}
 import tick/models/auth_token
+import tick/models/login_attempt.{
+  RateLimitCheck, can_attempt_login, make_rate_limit_response,
+  save_failed_login_attempt,
+}
 import tick/api.{
-  type ApiResponse, type ErrorResponse, ClientError, Data, DataWithResponse,
-  NotAuthenticated, ServerError, ValidationErrors,
+  type ApiResponse, type ErrorResponse, ClientError, Data, ErrorWithResponse,
+  NotAuthenticated, ServerError, SuccessWithResponse, ValidationErrors,
 }
 import tick/web.{type Context, auth_token_key}
 import wisp.{type Request}
@@ -32,20 +37,47 @@ pub fn sign_in(req: Request, ctx: Context) -> ApiResponse {
   use <- api.require_method(req, Post)
   use body <- api.json_body(req, sign_in_payload_decoder())
   use body <- try(validate_sign_in_payload(body))
-  use opt_user <- result.try(user.find_by_email(ctx.database, body.email))
+  use opt_user <- try(user.find_by_email(ctx.database, body.email))
+
   use user <- try(
     opt_user
     |> option.to_result(ClientError("Invalid email or password", 401)),
   )
+
+  use limit <- try(can_attempt_login(ctx.database, user.id))
+  use <- bool.guard(
+    when: !limit.can_attempt,
+    return: Error(ErrorWithResponse(
+      ClientError("Too many login attempts", 429),
+      make_rate_limit_response(limit),
+    )),
+  )
+
   use <- bool.guard(
     when: !user.verify_password(body.password, user.password),
-    return: Error(ClientError("Invalid email or password", 401)),
-  )
-  use token <- try(auth_token.new(ctx.database, user.id))
+    return: {
+      use _ <- try(save_failed_login_attempt(ctx.database, user.id))
 
-  web.set_cookie(req, auth_token_key, token.value, token.ttl_in_seconds)
-  |> DataWithResponse(user.to_json(user), _)
-  |> Ok()
+      // Append the proper rate limit headers to the response
+      let new_limit =
+        RateLimitCheck(
+          ..limit,
+          attempts_remaining: limit.attempts_remaining
+          - 1,
+        )
+
+      Error(ErrorWithResponse(
+        ClientError("Invalid email or password", 401),
+        make_rate_limit_response(new_limit),
+      ))
+    },
+  )
+
+  use token <- try(auth_token.new(ctx.database, user.id))
+  let cookie =
+    web.set_cookie(req, auth_token_key, token.value, token.ttl_in_seconds)
+
+  Ok(SuccessWithResponse(Data(user.to_json(user)), cookie))
 }
 
 pub fn sign_up(req: Request, ctx: Context) -> ApiResponse {
@@ -75,7 +107,7 @@ pub fn sign_out(req: Request, ctx: Context) -> ApiResponse {
   use _ <- try(auth_token.delete(ctx.database, token))
 
   web.remove_cookie(req, auth_token_key)
-  |> DataWithResponse(json.null(), _)
+  |> SuccessWithResponse(Data(json.null()), _)
   |> Ok()
 }
 
