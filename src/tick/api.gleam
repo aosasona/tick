@@ -65,6 +65,14 @@ pub fn to_response(response: ApiResponse) -> wisp.Response {
     Ok(res) -> handle_success_response(res)
     Error(res) -> handle_error_response(res)
   }
+  |> append_headers([
+    #("Access-Control-Allow-Origin", "*"),
+    #("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE"),
+    #(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, Cookie, Accept, Origin, X-Requested-With",
+    ),
+  ])
 }
 
 pub fn require_method(

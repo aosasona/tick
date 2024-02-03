@@ -53,12 +53,19 @@ pub fn sign_in(req: Request, ctx: Context) -> ApiResponse {
     )),
   )
 
-  use <- bool.guard(
-    when: !user.verify_password(body.password, user.password),
-    return: {
+  case user.verify_password(body.password, user.password) {
+    True -> {
+      use token <- try(auth_token.new(ctx.database, user.id))
+      let cookie =
+        web.set_cookie(req, auth_token_key, token.value, token.ttl_in_seconds)
+
+      Ok(SuccessWithResponse(Data(user.to_json(user)), cookie))
+    }
+
+    False -> {
       use _ <- try(save_failed_login_attempt(ctx.database, user.id))
 
-      // Append the proper rate limit headers to the response
+      // Append the proper rate limit headers to the response with the new limit
       let new_limit =
         RateLimitCheck(
           ..limit,
@@ -70,14 +77,8 @@ pub fn sign_in(req: Request, ctx: Context) -> ApiResponse {
         ClientError("Invalid email or password", 401),
         make_rate_limit_response(new_limit),
       ))
-    },
-  )
-
-  use token <- try(auth_token.new(ctx.database, user.id))
-  let cookie =
-    web.set_cookie(req, auth_token_key, token.value, token.ttl_in_seconds)
-
-  Ok(SuccessWithResponse(Data(user.to_json(user)), cookie))
+    }
+  }
 }
 
 pub fn sign_up(req: Request, ctx: Context) -> ApiResponse {
