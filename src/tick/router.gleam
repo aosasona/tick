@@ -8,6 +8,7 @@ import tick/web
 import wisp
 
 pub fn handle_request(req: wisp.Request, ctx: web.Context) -> wisp.Response {
+  use req <- wisp.handle_head(req)
   use <- wisp.serve_static(req, "/assets", ctx.web_directory <> "/assets")
 
   case request.path_segments(req) {
