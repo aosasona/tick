@@ -2,7 +2,6 @@ import crossbar.{string_value}
 import gleam/bool
 import gleam/dynamic
 import gleam/http.{Get, Post}
-import gleam/io
 import gleam/json
 import gleam/list
 import gleam/option.{type Option, None}

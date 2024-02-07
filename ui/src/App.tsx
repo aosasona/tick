@@ -1,6 +1,7 @@
 import { Router, Route } from "@solidjs/router";
 import { lazy } from "solid-js";
 import { ReloadPrompt } from "$/ui";
+import { Toaster } from "solid-sonner";
 
 export default function App() {
   const Dashboard = lazy(() => import("$/pages/dashboard"));
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/n/:id" component={Dashboard} />
         <Route path="*" component={lazy(() => import("$/pages/not-found"))} />
       </Router>
+      <Toaster />
     </>
   );
 }

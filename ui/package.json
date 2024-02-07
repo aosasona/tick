@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@nanostores/solid": "^0.4.2",
     "@solidjs/router": "^0.10.7",
     "axios": "^1.6.7",
+    "nanostores": "^0.9.5",
     "solid-js": "^1.8.7",
     "solid-sonner": "^0.2.2",
     "tailwind-merge": "^2.2.0"
